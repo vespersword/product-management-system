@@ -9,7 +9,7 @@ Documentation:
 - [Documentation](#docs)
 - [Key Features](#key-points)
 - [Authentication](#auth)
-- [Resources](#resources)
+- [Resource Features](#resources)
 - [API Feature Split](#API-Feature-Split)
 - [Implementation Details](#Implementation)
 
@@ -52,7 +52,7 @@ Additionally the API allows us to get a refresh token by making a ```GET``` requ
 - ```user``` has access to almost all User exclusive endpoints particularly involving user management.
 - ```merchant``` has access to almost all Merchant endpoints and ```Store``` endpoints.
 
-## <a name="resources"> Resources </a>
+## <a name="resources"> Resource Features </a>
 <b> List of Resources: </b>
 - [Users](#users)
 - [Merchants](#merchants)
@@ -69,6 +69,9 @@ Please refer the [Swagger doc](https://app.swaggerhub.com/apis-docs/vespers-apis
 
 ### <a name="users"> Users </a>
 __Description:__ This is the ```Users``` resource where User information is stored. <br>
+__Features:__
+- This is the consumer level account.
+- 
 __Example Value:__ <br>
 ```
 {
@@ -362,3 +365,9 @@ __Example Value:__ <br>
   }
 }
 ```
+## <a name="API-Feature-Split"> API Feature Split </a>
+__Please refer the [Swagger Doc](https://app.swaggerhub.com/apis-docs/vespers-apis/product-management-api/1.0.0) for a more in depth view of all the endpoints available. <br>
+In this section we are only going to discuss some of the features and endpoints in some of the API sub categories that haven't beem discussed yet and deserve some attention.__
+
+### C
+
