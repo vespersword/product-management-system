@@ -9,7 +9,7 @@ Documentation:
 - [Documentation](#docs)
 - [Key Features](#key-points)
 - [Authentication](#auth)
-- [Collections](#collections)
+- [Resources](#resources)
 - [API Feature Split](#API-Feature-Split)
 - [Implementation Details](#Implementation)
 
@@ -52,12 +52,12 @@ Additionally the API allows us to get a refresh token by making a ```GET``` requ
 - ```user``` has access to almost all User exclusive endpoints particularly involving user management.
 - ```merchant``` has access to almost all Merchant endpoints and ```Store``` endpoints.
 
-## <a name="collections"> Collections </a>
-<b> List of Collections: </b>
+## <a name="resources"> Resources </a>
+<b> List of Resources: </b>
 - [Users](#users)
 - [Merchants](#merchants)
 - [Stores](#stores)
-- [Categories](#categories)
+- [Categories](#categories) *** Very Important ***
 - [Products](#products)
 - [Inventory](#inventory)
 - [Catalogs](#catalogs)
@@ -65,22 +65,125 @@ Additionally the API allows us to get a refresh token by making a ```GET``` requ
 - [Shipping](#shipping)
 - [Brands](#brands)
 
+Please refer the Swagger doc for a more detailed look at the resources schema.
+
 ### <a name="users"> Users </a>
+__Description:__ This is the ```Users``` resource where User information is stored. <br>
+__Example Value:__ <br>
+```
+{
+    "username": "ron35",
+    "firstName": "Robert",
+    "lastName": "Kennedy",
+    "email": "email234@email.com",
+    "country": "USA",
+    "shippingAddress": {
+      "address": "72 Cardinal St. Mechanicsburg",
+      "state": "Pennsylvania",
+      "country": "USA",
+      "pin_code": 17050
+    }
+  }
+```
 
 ### <a name="merchants"> Merchants </a>
 
-### <a name="Stores"> Stores </a>
+__Description:__ This is the ```Merchants``` resource where Merchant information is stored. <br>
+__Example Value:__ <br>
+```
+{
+  "merchant_name": "Avinash Kishore",
+  "merchant_username": "merch1avinash",
+  "merchant_email": "merchavinash123@merchant.com",
+  "details": "string",
+  "password": "string",
+  "stores": [
+    {
+      "store_id": "123",
+      "store_name": "Store 1"
+    },
+    {
+      "store_id": "1234",
+      "store_name": "Store 2"
+    }
+  ]
+}
+```
 
-### <a name="Categories"> Categories </a>
+### <a name="stores"> Stores </a>
+__Description:__ This is the ```Stores```resource where store information is stored. These stores are created by Merchant accounts and we can see above how the IDs of these stores are stored in the ```merchants``` resource.<br>
+__Example Value:__ <br>
+```
+{
+  "store_id": "exampleshop123",
+  "store_name": "Example Store 1",
+  "details": {
+    "description": "This is an example description for Example Store 1.",
+    "phone_no": 1234567899,
+    "email": "examplemail@store.com"
+  },
+  "address_info": {
+    "address": "72 Cardinal St. Mechanicsburg",
+    "state": "Pennsylvania",
+    "country": "USA",
+    "pin_code": 17050
+  }
+}
+```
 
-### <a name="Products"> Products </a>
+### <a name="categories"> Categories </a>
+__Description:__ 
+- This is the ```Categories```resource where category information is stored. This is one of the most important resources because of how the category hierarchy is implemented. 
+- This API supports an ```N-level``` hierarchy of categories which are stored in a Tree like data structure where a category keeps track of its parent category and child categories. <br>
+ <b> Example: </b>
+ ```
+  *Books
+    - History
+      * Roman History
+      * Indian History
+        - Mughal History
+          * ...(and so on)
+        - British History
+    - Literature
+    - Romance
+ ```
+- Another very important feature here is how we generalise certain attributes among products
+<br>
+__Example Value:__ <br>
 
-### <a name="Inventory"> Inventory </a>
+```
+{
+  "parent_category_id": null,
+  "category_hierarchy_level": 0,
+  "category_name": "Books",
+  "category_id": "book",
+  "sku_label": "book",
+  "category_specific_attributes": {
+    "author": "string",
+    "no_of_pages": "number",
+    "format": "string",
+    "language": "string"
+  },
+  "description": "This category is for books.",
+  "sub_category_ids": [
+    [
+      "history_book",
+      "adventure_book",
+      "scifi_book"
+    ]
+  ]
+}
+```
 
-### <a name="Catalogs"> Catalogs </a>
 
-### <a name="Orders"> Orders </a>
+### <a name="products"> Products </a>
 
-### <a name="Shipping"> Shipping </a>
+### <a name="inventory"> Inventory </a>
 
-### <a name="Brands"> Brands </a>
+### <a name="catalogs"> Catalogs </a>
+
+### <a name="orders"> Orders </a>
+
+### <a name="shipping"> Shipping </a>
+
+### <a name="brands"> Brands </a>
