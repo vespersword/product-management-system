@@ -7,11 +7,12 @@ Documentation:
 
 ## Table of Contents
 - [Documentation](#docs)
+- [Implementation Details](#Implementation)
 - [Key Features](#key-points)
 - [Authentication](#auth)
 - [Resource Features](#resources)
 - [API Feature Split](#API-Feature-Split)
-- [Implementation Details](#Implementation)
+
 
 ## <a name="docs">Documentation </a>
 The API was documented using SwaggerHub and visualised with Swagger UI. <br>
@@ -19,8 +20,33 @@ Below are the links to check the Swagger UI Doc and YAML:
 - [Swagger UI Doc View](https://app.swaggerhub.com/apis-docs/vespers-apis/product-management-api/1.0.0/)
 - [SwaggerHub Code Editor View](https://app.swaggerhub.com/apis/vespers-apis/product-management-api/1.0.0)
 
+## <a name="Implementation"> Implementation Details </a>
+__Tools Used:__
+- Express
+- MongoDB Atlas
+- JWT (for authentication using Bearer Token method) 
+<br>
+Every unimplemented method and endpoint currently returns a ```501``` status code. 
+<br>
+To demonstrate the following features, ```user-auth api``` and ```users``` api have been completely implemented. <br>
+You can try them out [here.](https://app.swaggerhub.com/apis-docs/vespers-apis/product-management-api/1.0.0#/users.
+
+- __Rate Limiting:__
+    - The API has rate limiting implemented. Users who are not logged in can only make 10 requests every minute.
+    - Logged in users on the other hand can make a 1000 requests every minute.
+    
+- __Pagination:__
+    - The API also shows pagination for a lot of the ```GET``` methods.
+    - The following are the parameters used to control pagination in theses methods,
+        - ```page_size``` - ```type: number```, used to decide number of results per page(default is 5).
+        - ```page_no``` - ```type: number```, used to decide page number(gets first page by default).
+        
+- __Authentication:__
+    - This is implemented using the Bearer Token method specifically with JWT.
+
 ## <a name="key-points"> Key Features </a>
-- There are a total of 87 CRUD operations in the API to provide functionality for many common ecommerce features.
+- The API has been split into __20 sub categories__ to make the API more modular and group functionality better.
+- There are a total of __87 CRUD operations__ in the API to provide functionality for many common ecommerce features.
 - SKUs follow the following format: ```BRAND_LABEL-PRODUCT_CODE-PRODUCT_OPTION_VALUES```. Ex: ```BOSE-QC35-RED```
 - An ```N-level``` hierarchichal grouping of products based on ```category```. Categories are stored in a tree like structure.
 - ```Brand Management``` for products.
@@ -369,5 +395,43 @@ __Example Value:__ <br>
 __Please refer the [Swagger Doc](https://app.swaggerhub.com/apis-docs/vespers-apis/product-management-api/1.0.0) for a more in depth view of all the endpoints available. <br>
 In this section we are only going to discuss some of the features and endpoints in some of the API sub categories that haven't beem discussed yet and deserve some attention.__
 
-### C
+### Cart Api
+__Features:__
+- Users can have multiple carts.
+- If an item is added to cart but cart does not exist yet(in case of new user) a new cart is automatically created. Otherwise the item is automatically added to first cart.
+- Users can also specify which cart to do CRUD operations with.
+- On checkout(defined under ```orders api```) the cart is emptied and an order and shipment object is created.
 
+### Store Management API
+| Method | Endpoint                                      | Description                 | Query Parameter |
+|--------|-----------------------------------------------|-----------------------------|-----------------|
+| PUT    | /api/store/{storeId}/addProduct/{productId}   | Adds a product to the store | variant_sku     |
+| DELETE | /api/store{storeId}/deleteProduct/{productId} | Deletes product from store  | variant_sku     |
+
+- Here we can see that when adding a product to the store we have to mention which variant of the product it is in the query parameter.
+- Similarly when deleting a product from the store we have to mention which variant we are deleting.
+- In both cases if there is no variant of that product and only base product exists then we can leave the parameter empty.
+
+### Product Category Management
+| Method | Endpoint                                      | Description                 |
+|--------|-----------------------------------------------|-----------------------------|
+| PUT    | /api/categories/{categoryId}/move/{parentId}  | Make a category a subcategory of another category. |
+- This lets us make one category a subcategory of another.
+- It also appropriately updates the hierarchy level of all child categories under it.
+
+### User Authentication
+| Method | Endpoint                                      | Description                 | 
+|--------|-----------------------------------------------|-----------------------------|
+| POST   | /api/users/login                              | User login. Returns an auth token.| 
+| POST   | /api/merchants/login                          | Merchant login. Returns an auth token|
+| GET    | /api/auth/getRefreshToken                     | Returns a refresh token.    |
+- These are the 3 endpoints we have for user authentication.
+- The first two give a token and the third gives a refresh token.
+
+### Product Variant Api
+__Features__:
+- This lets us create variants of products.
+- Product variants can only be created after creation of product options through the ```product attributes/options``` api.
+- After creation of variant an inventory entry is automatically made with a unique SKU to identify the variant and its inventory details.
+
+__Note:__ Please check the remaining features and end points in the [Swagger Doc](https://app.swaggerhub.com/apis-docs/vespers-apis/product-management-api/1.0.0#/) as every end point has been properly documented in it.
