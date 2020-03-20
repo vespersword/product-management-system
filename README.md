@@ -39,6 +39,9 @@ You can try them out [here.](https://app.swaggerhub.com/apis-docs/vespers-apis/p
         x-ratelimit-remaining: 9 
         x-ratelimit-reset: 1584748020 
     ```
+    - __Screenshot:__
+    ![rate_limit](https://raw.githubusercontent.com/vespersword/product-management-system/master/rate_limit.png)
+    
 - __Pagination:__
     - The API also shows pagination for a lot of the ```GET``` methods.
     - The following are the parameters used to control pagination in theses methods,
