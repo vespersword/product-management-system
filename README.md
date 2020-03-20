@@ -186,8 +186,8 @@ __Features:__
 - The only products that are actually sold are the ones created through the endpoint used to create variants. If the base product has no variants then it should still be put through the variant creation endpoint albeit with a blank array for option values.
 - The base product can be considered as something like a template containing information for the variants.
 
-__Note:__ Go through the [Swagger Doc](https://app.swaggerhub.com/apis-docs/vespers-apis/product-management-api/1.0.0#/product%20option%2Fattribute%20management) to get a better understanding of how product info is stored as this is a complicated resource due to the product options and variants.
-__Example Values: __ <br>
+__Note:__ Go through the [Swagger Doc](https://app.swaggerhub.com/apis-docs/vespers-apis/product-management-api/1.0.0#/product%20option%2Fattribute%20management) to get a better understanding of how product info is stored as this is a complicated resource due to the product options and variants. <br>
+__Example Values:__ <br>
 __base product__ <br>
 ```
 {
@@ -318,5 +318,47 @@ __Example Value:__ <br>
 
 
 ### <a name="shipping"> Shipping </a>
+__Description:__ This is the ```Shipping```resource where shipment info is stored. This resource is closely connected to the orders resource. This resource is mostly controlled by the shipping company.
+__Features:__
+- The main feature of this resource is live tracking of order.
+- This live tracking can be implemented by the developer by using the API of whichever company is responsible for shipping to find current location.
+__Example Value:__ <br>
+```
+{
+  "shipment_id": 32,
+  "order_id": 1,
+  "free_shipping": true,
+  "delivery_address": {
+    "address": "72 Cardinal St. Mechanicsburg",
+    "state": "Pennsylvania",
+    "country": "USA",
+    "pin_code": 17050
+  },
+  "shipping_company": "Blue Dart",
+  "shipping_status": "in transit",
+  "current_location": {
+    "address": "72 Cardinal St. Mechanicsburg",
+    "state": "Pennsylvania",
+    "country": "USA",
+    "pin_code": 17050
+  }
+}
+```
 
 ### <a name="brands"> Brands </a>
+__Description:__ This is the ```Brands```resource where brand info is stored.
+__Features:__
+- The main feature of this resource is create Brands.
+- This resource is also important because the brand label is the first part of the SKU of a product.
+__Example Value:__ <br>
+```
+{
+  "brand_id": "bose",
+  "brand_name": "Bose",
+  "sku_label": "BOSE",
+  "details": {
+    "description": "This is a brand of the Bose company.",
+    "company": "Bose"
+  }
+}
+```
