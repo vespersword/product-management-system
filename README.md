@@ -28,7 +28,7 @@ __Tools Used:__
 <br>
 Every unimplemented method and endpoint currently returns a ```501``` status code. 
 <br>
-Rate limiting has been implemented.<br>
+Rate limiting has been implemented. Users api has been partially implemented.<br>
 You can try them out [here.](https://app.swaggerhub.com/apis-docs/vespers-apis/product-management-api/1.0.0#/users.
 
 - __Rate Limiting:__
