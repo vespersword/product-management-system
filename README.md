@@ -44,6 +44,8 @@ You can try them out [here.](https://app.swaggerhub.com/apis-docs/vespers-apis/p
 - __Authentication:__
     - This is implemented using the Bearer Token method specifically with JWT.
 
+- __Caching:__ Caching is done on the server side.
+
 ## <a name="key-points"> Key Features </a>
 - The API has been split into __20 sub categories__ to make the API more modular and group functionality better.
 - There are a total of __87 CRUD operations__ in the API to provide functionality for many common ecommerce features.
