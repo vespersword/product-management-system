@@ -28,13 +28,17 @@ __Tools Used:__
 <br>
 Every unimplemented method and endpoint currently returns a ```501``` status code. 
 <br>
-To demonstrate the following features, ```user-auth api``` and ```users``` api have been completely implemented. <br>
+Rate limiting has been implemented.<br>
 You can try them out [here.](https://app.swaggerhub.com/apis-docs/vespers-apis/product-management-api/1.0.0#/users.
 
 - __Rate Limiting:__
     - The API has rate limiting implemented. Users who are not logged in can only make 10 requests every minute.
     - Logged in users on the other hand can make a 1000 requests every minute.
-    
+    - Request headers,
+    ``` x-ratelimit-limit: 10 
+        x-ratelimit-remaining: 9 
+        x-ratelimit-reset: 1584748020 
+    ```
 - __Pagination:__
     - The API also shows pagination for a lot of the ```GET``` methods.
     - The following are the parameters used to control pagination in theses methods,
