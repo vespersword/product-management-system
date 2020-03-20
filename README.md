@@ -57,7 +57,7 @@ Additionally the API allows us to get a refresh token by making a ```GET``` requ
 - [Users](#users)
 - [Merchants](#merchants)
 - [Stores](#stores)
-- [Categories](#categories) *** Very Important ***
+- [Categories](#categories) *** Very Important(Please Read)***
 - [Products](#products)
 - [Inventory](#inventory)
 - [Catalogs](#catalogs)
@@ -134,7 +134,7 @@ __Example Value:__ <br>
 ### <a name="categories"> Categories </a>
 __Description:__ 
 - This is the ```Categories```resource where category information is stored. This is one of the most important resources because of how the category hierarchy is implemented. 
-- This API supports an ```N-level``` hierarchy of categories which are stored in a Tree like data structure where a category keeps track of its parent category and child categories. <br>
+- __Category Hierarchy:__ This API supports an ```N-level``` hierarchy of categories which are stored in a Tree like data structure where a category keeps track of its parent category and child categories. <br>
  <b> Example: </b>
  ```
   *Books
@@ -147,9 +147,11 @@ __Description:__
     - Literature
     - Romance
  ```
-- Another very important feature here is how we generalise certain attributes among products
-<br>
-__Example Value:__ <br>
+- __Attribute Generalisation:__ Another very important feature here is how we generalise certain attributes among products of the same category. This is normally a big problem as different products across the website are of different kinds and cannot have similar attributes which makes generalisation harder. <br>
+For example, a Novel and a Chair clearly have different attributes as one is a Book and the other is Furniture. <br>
+__Solution:__ We define category specific attributes for each category we define. Every category that's lower on the category hierarchy can then inherit these attributes.
+
+__Example Value:__  <br>
 
 ```
 {
