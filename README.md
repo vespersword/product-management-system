@@ -9,7 +9,7 @@ Documentation:
 - [Documentation](#docs)
 - [Key Features](#key-points)
 - [Authentication](#auth)
-- [Collections](#Collections)
+- [Collections](#collections)
 - [API Feature Split](#API-Feature-Split)
 - [Implementation Details](#Implementation)
 
@@ -21,6 +21,7 @@ Below are the links to check the Swagger UI Doc and YAML:
 
 ## <a name="key-points"> Key Features </a>
 - There are a total of 87 CRUD operations in the API to provide functionality for many common ecommerce features.
+- SKUs follow the following format: ```BRAND_LABEL-PRODUCT_CODE-PRODUCT_OPTION_VALUES```. Ex: ```BOSE-QC35-RED```
 - An ```N-level``` hierarchichal grouping of products based on ```category```. Categories are stored in a tree like structure.
 - ```Brand Management``` for products.
 - Separate account types for normal ```Users(consumers)``` and ```Merchants```.
@@ -38,4 +39,48 @@ Below are the links to check the Swagger UI Doc and YAML:
 - ```Customer Service``` feature which lets a ```User``` communicate with the ```Merchant``` who owns the store selling an item they are purchasing.
 
 ## <a name="auth"> Authorization </a>
-This API uses __Bearer Authentication__ also known as __token authentication__ and in particular uses ```JWT(JSON Web Token)```.
+This API uses __Bearer Authentication__ also known as __token authentication__ and in particular we are using ```JWT(JSON Web Token)``` to implement this. <br>
+The point of this is to give access to the user bearing the token. The big benefit of this method is that nothing has to be stored on the server side and the same authentication can be reused on a different website that has the same user database. <br>
+Below is the form in which the Authorization header takes,<br>
+```Authorization: Bearer {token}```
+<br>
+In our API we receive this token on successfully creating an account and then trying to login with valid credentials.<br>
+Additionally the API allows us to get a refresh token by making a ```GET``` request to the following end point ```/api/auth/getRefreshToken```. (Note: Tokens expire after 30 minutes which is why we have a refresh token feature) <br>
+### Permissions
+- There are 3 types of users in this API: ```admin```, ```user(consumer)``` and ```merchant```.
+- ```admin``` has access to every single CRUD operation in the API.
+- ```user``` has access to almost all User exclusive endpoints particularly involving user management.
+- ```merchant``` has access to almost all Merchant endpoints and ```Store``` endpoints.
+
+## <a name="collections"> Collections </a>
+<b> List of Collections: </b>
+- [Users](#users)
+- [Merchants](#merchants)
+- [Stores](#stores)
+- [Categories](#categories)
+- [Products](#products)
+- [Inventory](#inventory)
+- [Catalogs](#catalogs)
+- [Orders](#orders)
+- [Shipping](#shipping)
+- [Brands](#brands)
+
+### <a name="users"> Users </a>
+
+### <a name="merchants"> Merchants </a>
+
+### <a name="Stores"> Stores </a>
+
+### <a name="Categories"> Categories </a>
+
+### <a name="Products"> Products </a>
+
+### <a name="Inventory"> Inventory </a>
+
+### <a name="Catalogs"> Catalogs </a>
+
+### <a name="Orders"> Orders </a>
+
+### <a name="Shipping"> Shipping </a>
+
+### <a name="Brands"> Brands </a>
