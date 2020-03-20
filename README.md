@@ -65,7 +65,7 @@ Additionally the API allows us to get a refresh token by making a ```GET``` requ
 - [Shipping](#shipping)
 - [Brands](#brands)
 
-Please refer the Swagger doc for a more detailed look at the resources schema.
+Please refer the [Swagger doc](https://app.swaggerhub.com/apis-docs/vespers-apis/product-management-api/1.0.0) for a more detailed look at the resources schema.
 
 ### <a name="users"> Users </a>
 __Description:__ This is the ```Users``` resource where User information is stored. <br>
@@ -132,8 +132,8 @@ __Example Value:__ <br>
 ```
 
 ### <a name="categories"> Categories </a>
-__Description:__ 
-- This is the ```Categories```resource where category information is stored. This is one of the most important resources because of how the category hierarchy is implemented. 
+__Description:__  This is the ```Categories```resource where category information is stored. This is one of the most important resources because of how the category hierarchy is implemented. 
+#### Features
 - __Category Hierarchy:__ This API supports an ```N-level``` hierarchy of categories which are stored in a Tree like data structure where a category keeps track of its parent category and child categories. <br>
  <b> Example: </b>
  ```
@@ -179,12 +179,143 @@ __Example Value:__  <br>
 
 
 ### <a name="products"> Products </a>
+__Description:__ This is the ```Products```resource where product information is stored. This is the one of the most important resources as the API is for product management.<br>
+__Features:__
+- Product specific attributes/options can be created and are different from category specific attributes. Variants can only be created from product specific attributes.
+- After a variant is created it is automatically added into the product's inventory with a unique SKU.
+- The only products that are actually sold are the ones created through the endpoint used to create variants. If the base product has no variants then it should still be put through the variant creation endpoint albeit with a blank array for option values.
+- The base product can be considered as something like a template containing information for the variants.
+
+__Note:__ Go through the [Swagger Doc](https://app.swaggerhub.com/apis-docs/vespers-apis/product-management-api/1.0.0#/product%20option%2Fattribute%20management) to get a better understanding of how product info is stored as this is a complicated resource due to the product options and variants.
+__Example Values: __ <br>
+__base product__ <br>
+```
+{
+  "product_name": "Redmi Note Pro",
+  "product_id": "redminotepro",
+  "sku": "RED-redminotepro",
+  "tags": [
+    "phone",
+    "redmi",
+    "pro",
+    "smart"
+  ],
+  "category_id": "smartphone",
+  "details": {
+    "description": "This is the latest smartphone from Redmi.",
+    "price": 14999
+  }
+}
+```
+
+__product options__ <br>
+```
+[
+  {
+    "option_name": "colour",
+    "option_id": 1,
+    "description": "This option allows you to pick the colour of the product.",
+    "option_values": [
+      {
+        "is_default": "true",
+        "option_value_name": "blue",
+        "sku_label": "BLU",
+        "value_id": "1",
+        "additional_details": {
+          "description": "This is the blue colour option."
+        }
+      },
+      {
+        "is_default": "false",
+        "option_value_name": "red",
+        "sku_label": "RED",
+        "value_id": "2",
+        "additional_details": {
+          "description": "This is the red colour option."
+        }
+      }
+    ]
+  }
+]
+```
+
+To see more possibilities please check the [Swagger Doc](https://app.swaggerhub.com/apis-docs/vespers-apis/product-management-api/1.0.0#/product%20option%2Fattribute%20management).
 
 ### <a name="inventory"> Inventory </a>
+__Description:__ This is the ```Inventory```resource where product inventory info is stored. This resources is nested within the product resource.
+__Features:__
+- Stores each variant as a separate inventory unit each identified by a unique SKU. 
+- As mentioned above this API follows an SKU template of the following type - ```(Brand Label)-(Product ID)-[Product Option Values]```.
+- Each inventory unit shows how much stock each store selling a product has.
+- We can also filter to find stock in specific stores.
+__Example Value:__ <br>
+```
+[
+  {
+    "sku": "PUMA-SHIRT-GREEN-SMALL",
+    "store_inventory": [
+      [
+        {
+          "store_id": "mystore123",
+          "stock": 8
+        },
+        {
+          "store_id": "mystore12",
+          "stock": 14
+        },
+        {
+          "store_id": "mystore12345",
+          "stock": 0
+        }
+      ]
+    ]
+  }
+]
+```
 
 ### <a name="catalogs"> Catalogs </a>
+__Description:__ This is the ```Catalog```resource where catalog info is stored. This resources lets us group products of various types together. A catalog is basically a grouping of various types of products.
+__Features:__
+- There are 2 types of catalogs that can be created, Global ones for the entire website and local ones which are created by a store for the products they sell.
+- Catalogs add another way of fitering products and also give another way of arranging products.
+__Example Value:__ <br>
+```
+{
+  "catalog_id": "fashion",
+  "catalog_name": "Fashion Catalogue",
+  "details": {},
+  "product_list": [
+    "denim_shirt",
+    "nike_boots"
+  ]
+}
+```
 
 ### <a name="orders"> Orders </a>
+__Description:__ This is the ```Orders```resource where order info is stored. This resource is nested in the user resource and shows us a users orders. This resource is closely connected to the shipping resource.
+__Features:__
+- When checkout process is complete in the cart an order is created and the cart is emptied. Along with the order a shipment item is also created in the shipping collection and both of these store each others' IDs.
+- We can see information about our order such as payment method and status of order(fulfilled or not).
+- We can also cancel an order which then leads to the shipment to delivery address being cancelled.
+__Example Value:__ <br>
+```
+{
+  "username": "user123",
+  "order_id": 1,
+  "shipment_id": 32,
+  "order_items": [
+    {
+      "product_id": "bata_shoes",
+      "product_variant_id": "string",
+      "quantity": 0
+    }
+  ],
+  "status": "In Transit",
+  "payment_method": "COD",
+  "bill_paid": false
+}
+```
+
 
 ### <a name="shipping"> Shipping </a>
 
