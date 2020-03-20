@@ -1,0 +1,3198 @@
+openapi: 3.0.0
+info:
+  version: '1.0.0'
+  title: "Vaibhav's Online Market"
+  description: 'This is an API for an online product management system.'
+
+servers:
+  - description: Deployed Server
+    url: https://vaibhav-market.herokuapp.com
+  - description: Local Host
+    url: localhost:3000
+  # Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/vespers-apis/product-management-api/1.0.0
+    
+tags:
+  - name: "user-auth"
+    description: User authentication and authorization api
+  - name: "users"
+    description: Users api
+  - name: "cart"
+    description: User Cart api
+  - name: "merchants"
+    description: Merchants api.
+  - name: "store management"
+    description: Store management api.
+  - name: "product management"
+    description: Product management api
+  - name: "product category management"
+    description: Product category api
+  - name: "product option/attribute management"
+    description: Product option/attribute api
+  - name: "product variant management"
+    description: Product variant api
+  - name: "product image management"
+    description: Product image api
+  - name: "inventory management"
+    description: Product inventory management api.
+  - name: "catalog management"
+    description: Catalog management api
+  - name: "brand management"
+    description: Brand management api
+  - name: "orders"
+    description: Everything to do with orders placed.
+  - name: "shipping"
+    description: Everything to do with shipment.
+  - name: "payment"
+    description: Everything to do with payment.
+  - name: "reviews"
+    description: Product reviews api.
+  - name: "search"
+    description: Search api
+  - name: "product recommendation"
+    description: Product recommendation api
+  - name: "customer service"
+    description: Customer service api
+  
+paths:
+  /api/users:
+    get:
+      tags:
+        - users
+      operationId: getUsers
+      summary: Get details about users.
+      description: Returns an array of users.
+      parameters: 
+        - name: limit
+          required: false
+          description: Limits the number of users retrieved.
+          schema:
+            type: number
+          in: query
+        - name: country
+          required: false
+          description: Find users from given country.
+          schema:
+            type: string
+          in: query
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/users"
+    post:
+      tags:
+        - users
+      operationId: createUser
+      summary: Create a user.
+      description: Creates a user with the given details.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/user"
+      responses:
+        200:
+          description: Success
+        201:
+          description: User successfully created.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/user"
+        400:
+          description: Something went wrong.
+        501:
+          description: Not implemented.
+          
+  /api/users/{username}:
+    get:
+      tags:
+        - users
+      summary: Get specific user.
+      description: Get a specific user based on their username.
+      operationId: getSpecificUser
+      parameters:
+        - name: "username"
+          required: true
+          description: Username of user who's details you want to check.
+          in: path
+          schema:
+            type: string
+      responses:
+        200: 
+          description: Successfully retrieved.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/user"
+        
+        400:
+          description: Invalid username supplied.
+        404:
+          description: User not found.
+        501:
+          description: Not implemented.
+    put:
+      tags:
+        - users
+      operationId: updateUser
+      parameters:
+        - name: "username"
+          required: true
+          description: Username of user who's details are being updated.
+          in: path
+          schema:
+            type: string
+      summary: Update user details.
+      description: Can only be done by logged in user.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/user"
+      responses:
+        200:
+          description: Details successfully updated.
+        400:
+          description: Invalid input.
+        401:
+          description: Valid authorization required.
+        501:
+          description: Not implemented.
+    delete:
+      tags:
+        - users
+      operationId: deleteUser
+      parameters:
+        - name: "username"
+          required: true
+          description: Username of user to be deleted.
+          in: path
+          schema:
+            type: string
+      summary: Delete user.
+      description: Can only be done by logged in user.
+      responses:
+        200:
+          description: Success.
+        204:
+          description: User successfully deleted.
+        400:
+          description: Something went wrong.
+        401:
+          description: Valid authentication required.
+        501:
+          description: Not implemented.
+        
+  /api/users/{username}/cart/{cartId}:
+    get:
+      tags:
+        - cart
+      operationId: getCart
+      summary: Get a specific cart of the user
+      description: Get information about items in the cart of a logged in user.
+      parameters:
+        - name: username
+          required: true
+          description: Username of user who's cart info needs to be retrieved.
+          in: path
+          schema:
+            type: string
+        - name: cartId
+          required: true
+          description: Id of the specific cart.
+          in: path
+          schema:
+            type: string
+            
+      responses:
+        200:
+          description: Successfully retrieved cart.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/cart"
+        
+        400:
+          description: Something went wrong.
+        401:
+          description: Authorization failed.
+        501:
+          description: Not implemented.
+      
+    post:
+      tags:
+        - cart
+      summary: Add product to specific cart.
+      description: Adds a product to a specific cart. This should be used on a product page.
+      operationId: addToCart
+      parameters:
+        - name: username
+          required: true
+          description: Username of user who's cart info needs to be retrieved.
+          in: path
+          schema:
+            type: string
+        - name: cartId
+          required: true
+          description: Id of the specific cart.
+          in: path
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/cart_item"
+      responses:
+        201:
+          description: Successfully added to cart.
+        400:
+          description: Something went wrong.
+        401:
+          description: Valid authentication required.
+        501:
+          description: Not implemented.
+  
+  /api/users/{username}/cart:
+    get:
+      tags:
+        - cart
+      operationId: getAllCarts
+      summary: Get all carts of the user
+      description: Get information about items in the cart of a logged in user.
+      parameters:
+        - name: username
+          required: true
+          description: Username of user who's cart info needs to be retrieved.
+          in: path
+          schema:
+            type: string
+            
+      responses:
+        200:
+          description: Successfully retrieved carts.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/cart"
+        
+        400:
+          description: Something went wrong.
+        401:
+          description: Authorization failed.
+        501:
+          description: Not implemented.
+      
+    post:
+      tags:
+        - cart
+      summary: Add product to cart. 
+      description: Adds a product to cart. If no cart exists then a cart with a unique id is automatically created. If carts do exist then product is automatically added to first cart.
+      operationId: addToCartInit
+      parameters:
+        - name: username
+          required: true
+          description: Username of user who's cart info needs to be retrieved.
+          in: path
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/cart_item"
+      responses:
+        201:
+          description: Successfully added to cart.
+        400:
+          description: Something went wrong.
+        401:
+          description: Valid authentication required.
+        501:
+          description: Not implemented.
+    
+  /api/users/login:
+    post:
+      tags:
+        - user-auth
+      summary: User authentication.
+      description: Login system to authorise the user.
+      operationId: userLogin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/login"
+              
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                example: {"token":"string"}
+        201:
+          description: Login Successful
+        404:
+          description: Not found.
+        501:
+          description: Not implemented.
+  
+  /api/auth/getRefreshToken:        
+    get:
+      tags:
+        - user-auth
+      summary: Get refresh token.
+      description: User must be logged in. Get a refresh token for the user.
+      operationId: getRefreshToken
+      responses:
+        200:
+          description: Success
+        201:
+          description: Token created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/refreshToken"
+                
+  /api/categories:
+    get:
+      tags:
+        - product category management
+      summary: Get categories.
+      description: Get all product categories.
+      operationId: getCategories
+      parameters:
+        - name: hierarchyLevel
+          in: query
+          schema:
+            type: number
+          description: Get categories based on hierarchy. 0 is root level categories.
+          
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/categories"
+        400:
+          description: Something went wrong.
+        501:
+          description: Not implemented.
+    post:
+      tags:
+        - product category management
+      summary: Create product category.
+      description: Create a new product category.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/category"
+      operationId: createCategory
+      responses:
+        201:
+          description: Successfully created.
+        400:
+          description: Something went wrong.
+        401:
+          description: Valid authentication required.
+        501:
+          description: Not implemented.
+  
+  /api/categories/{categoryId}:
+    get:
+      tags:
+        - product category management
+      summary: Get particular category.
+      description: Get category based on category ID.
+      operationId: getSpecificCategory
+      parameters:
+        - name: categoryId
+          required: true
+          description: ID of the category we want to get.
+          in: path
+          schema:
+            type: string
+      responses:
+        200:
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/category"
+        
+        404:
+          description: Category does not exist.
+    
+    delete:
+      tags:
+        - product category management
+      summary: Delete particular category.
+      description: Delete category which has given ID.
+      operationId: deleteSpecificCategory
+      parameters:
+        - name: categoryId
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        204:
+          description: Successfully deleted.
+        401:
+          description: Valid authentication required.
+        404:
+          description: Category does not exist.
+        501:
+          description: Not implemented.
+    
+    put:
+      tags:
+        - product category management
+      summary: Update particular category.
+      description: Update category based on category ID.
+      operationId: updateCategory
+      parameters:
+        - name: categoryId
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/category"
+      responses:
+        204:
+          description: Successfully updated.
+        401:
+          description: Valid authentication required.
+        404:
+          description: Category does not exist.
+        501:
+          description: Not implemented.
+          
+  /api/categories/{categoryId}/move/{parentId}:
+    put:
+      tags:
+        - product category management
+      summary: Move a category under another category(make it a sub-category).
+      description: Makes {categoryId} a sub-category of {parentId}. Hierarchy levels of all sub-categories of {categoryId} are appropriately updated.
+      parameters:
+        - name: categoryId
+          required: true
+          in: path
+          schema:
+            type: string
+        - name: parentId
+          required: true
+          in: path
+          schema:
+            type: string
+      operationId: moveCategory
+      responses:
+        204:
+          description: Successfully moved category.
+        401:
+          description: Valid authentication required.
+        404:
+          description: Category does not exist(either parent or child).
+        501:
+          description: Not implemented.
+          
+  /api/merchant/login:
+    post:
+      tags: 
+        - user-auth
+      summary: Merchant authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/login"
+      operationId: merchantLogin
+      responses:
+        200:
+          description: Successfully logged in.
+          content:
+            application/json:
+              schema:
+                type: object
+                example: {"token":"string"}
+        400:
+          description: Something went wrong.
+        501:
+          description: Not implemented.
+          
+  /api/merchants:
+    post:
+      tags:
+        - merchants
+      summary: Merchant account creation.
+      description: Create a merchant account.
+      operationId: createMerchant
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/merchant"
+      responses:
+        201:
+          description: Successfully created merchant account.
+        400:
+          description: Something went wrong.
+        501:
+          description: Not implemented.
+    get:
+      tags:
+        - merchants
+      summary: Get merchants.
+      description: Get details of merchants.
+      operationId: getMerchants
+      parameters:
+        - name: page_size
+          description: Decides page size. (default value is 5)
+          schema:
+            type: number
+          in: query
+          example: 5
+        - name: page_no
+          description: Decides page number. (retrieves first page by default)
+          schema:
+            type: number
+          example: 1
+          in: query
+      responses:
+        200:
+          description: Successfully retrieved results.
+        400:
+          description: Something went wrong.
+        501:
+          description: Not implemented.
+      
+  /api/merchants/{merchantId}:
+    get:  
+      tags:
+        - merchants
+      summary: Get specific merchant.
+      description: Get merchant details based on merchant username.
+      operationId: getSpecificMerchant
+      parameters:
+        - name: merchantId
+          description: This is the username of the merchant.
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        200:
+          description: Successfully retrieved info.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/specific_merchant"
+          
+        400:
+          description: Something went wrong.
+        501:
+          description: Not implemented.
+    put:
+      tags:
+        - merchants
+      summary: Update merchant details.
+      description: Update merchant account.
+      parameters:
+        - name: merchantId
+          required: true
+          description: Username of the merchant.
+          in: path
+          schema:
+            type: string
+      operationId: updateMerchant
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/merchant"
+      responses:
+        201:
+          description: Successfully updated merchant account.
+        400:
+          description: Something went wrong.
+        401:
+          description: Valid authentication required.
+        501:
+          description: Not implemented.
+    delete:
+      tags:
+        - merchants
+      summary: Delete merchant.
+      description: Deletes merchant account.
+      operationId: deleteMerchant
+      parameters:
+        - name: merchantId
+          required: true
+          description: Username of the merchant.
+          in: path
+          schema:
+            type: string
+      responses:
+        201:
+          description: Successfully deleted.
+        400:
+          description: Something went wrong.
+        401:
+          description: Valid authentication required.
+        501:
+          description: Not implemented.
+          
+  /api/brands/:
+    post:
+      tags:
+        - brand management
+      operationId: createBrand
+      summary: Create brand.
+      description: Create a brand.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/brand"
+      responses:
+        201:
+          description: Brand successfully created.
+        400:
+          description: Something went wrong.
+        401:
+          description: Valid authentication required.
+        501:
+          description: Not implemented.
+      
+    get:
+      tags:
+        - brand management
+      summary: Get brands.
+      description: Get an array of brands with details.
+      parameters:
+        - name: page_size
+          description: Decides page size. (default value is 5)
+          schema:
+            type: number
+          in: query
+          example: 5
+        - name: page_no
+          description: Decides page number. (retrieves first page by default)
+          schema:
+            type: number
+          example: 1
+          in: query
+      operationId: getBrands
+      responses:
+        200:
+          description: Successfully retrieved brands.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/brand"
+        400:
+          description: Something went wrong.
+        501:
+          description: Not implemented.
+  /api/brands/{brandId}:
+    get:
+      operationId: getSpecificBrand
+      tags:
+        - brand management
+      summary: Get specific brand.
+      description: Get brand details based on ID.
+      parameters:
+        - name: brandId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Id of the brand.
+      responses:
+        200:
+          description: Successfully retrieved brand details.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/brand"
+        404:
+          description: Brand not found
+        501:
+          description: Not implemented.
+    delete:
+      operationId: deleteBrand
+      tags:
+        - brand management
+      summary: Delete brand.
+      description: Delete brand with given ID.
+      parameters:
+        - name: brandId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID of the brand we want to delete.
+      responses:
+        201:
+          description: Successfully deleted brand.
+        404:
+          description: Brand not found.
+        501:
+          description: Not implemented.
+    put:
+      operationId: updateBrand
+      tags:
+        - brand management
+      summary: Update details.
+      description: Update details of given brand.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/brand"
+      parameters:
+        - name: brandId
+          required: true
+          in: path
+          schema:
+            type: string
+          description: ID of brand we want to update.
+      responses:
+        201:
+          description: Brand successfully created.
+        400:
+          description: Something went wrong.
+        401:
+          description: Valid authentication required.
+        501:
+          description: Not implemented.
+          
+  /api/stores:
+    post:
+      tags:
+        - store management
+      summary: Create a store.
+      description: Create a new store. Must be logged in as a merchant to create a store.
+      operationId: createStore
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/store"
+      responses:
+        201:
+          description: Successfully created store.
+        400:
+          description: Something went wrong.
+        401:
+          description: Valid authentication required.
+        501:
+          description: Not implemented.
+    get:
+      tags:
+        - store management
+      summary: Get stores.
+      operationId: getStores
+      description: Get stores on the website. Default page size is 5. First page is retrieved by default.
+      parameters:
+        - name: page_size
+          description: Decides page size. (default value is 5)
+          schema:
+            type: number
+          in: query
+          example: 5
+        - name: page_no
+          description: Decides page number. (retrieves first page by default)
+          schema:
+            type: number
+          example: 1
+          in: query
+      responses:
+        200:
+          description: Successfully retrieved data.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/store"
+        400:
+          description: Something went wrong.
+        501:
+          description: Not implemented.
+          
+  /api/stores/{storeId}:
+    get:
+      tags:
+        - store management
+      summary: Get specific store.
+      operationId: getSpecificStore
+      description: Get store based on store ID.
+      parameters:
+        - name: storeId
+          description: ID of the store we want to retrieve.
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        200:
+          description: Successfully retrieved data.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/store"
+        
+        404:
+          description: Store not found.
+        501:
+          description: Not implemented.
+    put:
+      tags:
+        - store management
+      summary: Update store details.
+      operationId: updateStore
+      description: Update details of a store. Store can only be updated if you are logged in as the merchant account that created the store or if you are logged in as admin.
+      parameters:
+        - name: storeId
+          description: ID of the store we want to update.
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/store"
+      responses:
+        201:
+          description: Successfully udpated details.
+        401:
+          description: Valid authentication required.
+        404:
+          description: Store not found.
+        501:
+          description: Not implemented.
+    delete:
+      tags:
+        - store management
+      parameters:
+        - name: storeId
+          description: ID of the store we want to delete.
+          required: true
+          in: path
+          schema:
+            type: string
+      operationId: deleteStore
+      summary: Delete store.
+      description: Delete store based on given ID. Only store owner and admin are authorized to do this.
+      responses:
+        201:
+          description: Successfully deleted store.
+        404:
+          description: Store not found.
+        501:
+          description: Not implemented.
+          
+  /api/merchants/{merchantId}/stores:
+    get:
+      tags:
+        - merchants
+      operationId: getMerchantStores
+      summary: Get merchant's stores.
+      description: This gives us an array containing the IDs of all stores created by the given merchant.
+      parameters:
+        - name: merchantId
+          description: ID of the merchant.
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Successfully retrieved stores.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: {}
+                example: ["mystore1","mystore2","mystore3"]
+        404:
+          description: Merchant does not exist.
+        501:
+          description: Not implemented.
+          
+  /api/stores/{storeId}/addProduct/{productId}:
+    put:
+      tags:
+        - store management
+      summary: Add product to store.
+      operationId: addProductToStore
+      description: Add product to store from existing product listing. Requires admin or store owner level authorization.
+      parameters:
+        - name: storeId
+          description: ID of the store which is adding a product.
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: productId
+          description: ID of the product which is being added.
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: variant_sku
+          description: SKU of the actual variant of product being added.
+          in: query
+          schema:
+            type: string
+            example: "BOSE-QC35-BLU"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: 
+              type: object
+              properties:
+                store_price:
+                  type: number
+                is_discounted:
+                  type: boolean
+                  example: false
+                discount_price:
+                  type: number
+                is_free_shipping:
+                  type: boolean
+                
+                
+      responses:
+        201:
+          description: Product successfully added to store.
+        401:
+          description: Valid authorization is required.
+        404:
+          description: Product or store does not exist.
+        501:
+          description: Not implemented.
+    delete:
+      tags:
+        - store management
+      summary: Remove product from store.
+      operationId: removeProductFromStore
+      description: Removes product from the store. Requires admin or store owner authorization.
+      parameters:
+        - name: storeId
+          description: ID of the store which is removing a product.
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: productId
+          description: ID of the product which is being removed.
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        201:
+          description: Product successfully removed from store.
+        401:
+          description: Valid authorization is required.
+        404:
+          description: Product or store does not exist.
+        501:
+          description: Not implemented.
+        
+        
+  
+  /api/products:
+    get:
+      tags:
+        - product management
+      operationId: getProducts
+      summary: Get products on the website.
+      description: Get products listed on the website. There are many ways of filtering products as we can see from the below parameters.
+      parameters:
+        - name: brand_id
+          description: This is the brand id of a brand. Used to get products of a specific brand.
+          in: query
+          example: bose
+          schema:
+            type: string
+        - name: category_id
+          description: This is the category id of a category. Used to get products from a specific category.
+          in: query
+          example: headphones
+          schema:
+            type: string
+        - name: store_id
+          description: This is the store id of the store. Used to list products from a particular store.
+          schema:
+            type: string
+          in: query
+          example: "Store 1"
+        - name: catalog_id
+          description: This is the ID of catalog. Used to get products in a particular catalog.
+          in: query
+          schema:
+            type: string
+        - name: page_size
+          description: Decides page size. (default value is 5)
+          schema:
+            type: number
+          in: query
+          example: 5
+        - name: page_no
+          description: Decides page number. (retrieves first page by default)
+          schema:
+            type: number
+          example: 1
+          in: query
+      responses:
+        200:
+          description: Successfully retrieved products.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/product"
+        400:
+          description: Something went wrong.
+        501:
+          description: Not implemented.
+  
+    post:
+      tags:
+        - product management
+      operationId: createProduct
+      summary: Create a product listing.
+      description: Creates a product listing (this is the base variant) Requires either admin or merchant level authorization. After successful creation a product code and SKU code is returned. An SKU is automatically created for the product after creation.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/product_post"
+      responses:
+        200:
+          description: Successfully created product.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/product_post_response"
+        400:
+          description: Something went wrong.
+        401:
+          description: Valid authorization is required.
+        501:
+          description: Not implemented.
+  
+  /api/products/{productId}:
+    get:
+      tags:
+        - product management
+      operationId: getSpecificProduct
+      summary: Get specific product details.
+      description: Get details of product with given id.
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID of the product.
+      responses:
+        200:
+          description: Successfully retrieved product info.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/product"
+        404:
+          description: Product does not exist.
+        501:
+          description: Not implemented.
+    put:
+      tags:
+        - product management
+      operationId: updateProduct
+      summary: Update product details.
+      description: Update product details of given product id. Requires admin level authorization.
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID of the product.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/product_post"
+      responses:
+        201:
+          description: Product updated successfully.
+        400:
+          description: Something went wrong.
+        401:
+          description: Valid authorization required.
+        404:
+          description: Product not found.
+        501:
+          description: Not implemented.
+    delete:
+      tags:
+        - product management
+      operationId: deleteProduct
+      summary: Remove product listing.
+      description: Remove product of given ID from listings. Requires admin level authorization.
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID of the product.
+      responses:
+        201:
+          description: Product deleted successfully.
+        401:
+          description: Valid authorization required.
+        404:
+          description: Product not found.
+        501:
+          description: Not implemented.
+          
+  /api/products/{productId}/options:
+    post:
+      tags:
+        - product option/attribute management
+      operationId: createOption
+      summary: Create a variant option.
+      description: Create a variant option for the given product. Requires admin level authorization.
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID of the product.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/option"
+      responses:
+        201:
+          description: Successfully created option.
+        400:
+          description: Something went wrong.
+        401:
+          description: Valid authorization required.
+        404:
+          description: Product not found.
+        501:
+          description: Not implemented.
+    get:
+      tags:
+        - product option/attribute management
+      operationId: getOptions
+      summary: Get variant options.
+      description: Get variant options for the given product.
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID of the product.
+      responses:
+        200:
+          description: Successfully retrieved options.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/option"
+        
+        404:
+          description: Product not found.
+        501:
+          description: Not implemented.
+  /api/products/{productId}/options/{optionId}:
+    get:
+      tags:
+        - product option/attribute management
+      summary: Get variant option.
+      description: Get specific variant option.
+      operationId: getOption
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID of the product.
+        - name: optionId
+          description: ID of the option.
+          required: true
+          in: path
+          schema:
+            type: number
+      responses:
+        200:
+          description: Successfully retrieved.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/option"
+        404:
+          description: Option or product do not exist.
+        501:
+          description: Not implemented.
+    delete:
+      tags:
+        - product option/attribute management
+      summary: Delete variant option.
+      operationId: deleteOption
+      description: Delete specific variant option. Requires admin level access.
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID of the product.
+        - name: optionId
+          description: ID of the option.
+          required: true
+          in: path
+          schema:
+            type: number
+      responses:
+        201:
+          description: Successfully deleted.
+        401:
+          description: Valid authorization is required.
+        404:
+          description: Option or product do not exist.
+        501:
+          description: Not implemented.
+    put:
+      tags:
+        - product option/attribute management
+      summary: Update variant option.
+      operationId: updateOption
+      description: Update specific variant option. Requires admin level access.
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID of the product.
+        - name: optionId
+          description: ID of the option.
+          required: true
+          in: path
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/option"
+      responses:
+        201:
+          description: Successfully updated.
+        401:
+          description: Valid authorization is required.
+        404:
+          description: Option or product do not exist.
+        501:
+          description: Not implemented.
+  
+  /api/products/{productId}/options/{optionId}/values:
+    post:
+      tags:
+        - product option/attribute management
+      operationId: createOptionValue
+      summary: Create a new option value.
+      description: Create a new option value for the given product option. Requires admin level authorization.
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID of the product.
+        - name: optionId
+          in: path
+          required: true
+          schema:
+            type: number
+          description: ID of the option.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/option_value"
+      responses:
+        201:
+          description: Successfully created option value.
+        400:
+          description: Something went wrong.
+        401:
+          description: Valid authorization required.
+        404:
+          description: Product or option not found.
+        501:
+          description: Not implemented.
+    get:
+      tags:
+        - product option/attribute management
+      operationId: getOptionValues
+      summary: Get option values.
+      description: Get all option values.
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID of the product.
+        - name: optionId
+          in: path
+          required: true
+          schema:
+            type: number
+          description: ID of the option.
+      responses:
+        200:
+          description: Successfully retrieved option values.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/option_value"
+        400:
+          description: Something went wrong.
+        404:
+          description: Product or option not found.
+        501:
+          description: Not implemented.
+          
+  /api/products/{productId}/options/{optionId}/values/{valueId}:
+    put:
+      tags:
+        - product option/attribute management
+      operationId: updateOptionValue
+      summary: Update option value.
+      description: Update an option value for the given product option value. Requires admin level authorization.
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID of the product.
+        - name: optionId
+          in: path
+          required: true
+          schema:
+            type: number
+          description: ID of the option.
+        - name: valueId
+          in: path
+          required: true
+          schema:
+            type: number
+          description: ID of the value.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/option_value"
+      responses:
+        201:
+          description: Successfully updated option value.
+        400:
+          description: Something went wrong.
+        401:
+          description: Valid authorization required.
+        404:
+          description: Product, option or option value not found.
+        501:
+          description: Not implemented.
+    get:
+      tags:
+        - product option/attribute management
+      operationId: getSpecificOptionValue
+      summary: Get specific option value.
+      description: Get option value for the given product option value.
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID of the product.
+        - name: optionId
+          in: path
+          required: true
+          schema:
+            type: number
+          description: ID of the option.
+        - name: valueId
+          in: path
+          required: true
+          schema:
+            type: number
+          description: ID of the value.
+      responses:
+        200:
+          description: Successfully retrieved option value info.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/option_value"
+        400:
+          description: Something went wrong.
+        404:
+          description: Product, option or option value not found.
+        501:
+          description: Not implemented.
+    
+    delete:
+      tags:
+        - product option/attribute management
+      operationId: deletOptionValue
+      summary: Delete option value.
+      description: Delete an option value for the given product option value. Requires admin level authorization.
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID of the product.
+        - name: optionId
+          in: path
+          required: true
+          schema:
+            type: number
+          description: ID of the option.
+        - name: valueId
+          in: path
+          required: true
+          schema:
+            type: number
+          description: ID of the value.
+      responses:
+        201:
+          description: Successfully deleted option value.
+        400:
+          description: Something went wrong.
+        401:
+          description: Valid authorization required.
+        404:
+          description: Product, option or option value not found.
+        501:
+          description: Not implemented.
+          
+  /api/products/{productId}/variants:
+    post:
+      tags:
+        - product variant management
+      operationId: createVariant
+      summary: Create a variant of the product.
+      description: Creates a variant. Also automatically creates an inventory entry for inventory management for the particular variant. Requires admin authorization.
+      parameters:
+        - name: productId
+          required: true
+          in: path
+          description: ID of the product.
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/variant_post"
+      responses:
+        200:
+          description: Successfully created variant.
+        400:
+          description: Something went wrong.
+        401:
+          description: Valid authorization required.
+        404:
+          description: Product not found.
+        501:
+          description: Not implemented.
+          
+    get:
+      tags:
+        - product variant management
+      summary: Get all variants of the product.
+      description: Get all variants of the given product.
+      parameters:
+        - name: productId
+          required: true
+          in: path
+          description: ID of the product.
+          schema:
+            type: string
+      responses:
+        200:
+          description: Successfully retrieved variants.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/variant_post"
+        404:
+          description: Product not found.
+        501:
+          description: Not implemented.
+    
+  /api/products/{productId}/variants/{variantId}:
+    get:
+      tags:
+        - product variant management
+      operationId: getSpecificVariant
+      summary: Get specific variant.
+      description: Get variant based on id.
+      parameters:
+        - name: productId
+          required: true
+          in: path
+          description: ID of the product.
+          schema:
+            type: string
+        - name: variantId
+          required: true
+          in: path
+          description: ID of the variant.
+          schema:
+            type: string
+      responses:
+        200:
+          description: Successfully retrieved variant.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/variant_post"
+        404:
+          description: Product or variant not found.
+        501:
+          description: Not implemented.
+    delete:
+      tags:
+        - product variant management
+      operationId: deleteVariant
+      summary: Delete specific variant.
+      description: Delete variant based on id.
+      parameters:
+        - name: productId
+          required: true
+          in: path
+          description: ID of the product.
+          schema:
+            type: string
+        - name: variantId
+          required: true
+          in: path
+          description: ID of the variant.
+          schema:
+            type: string
+      responses:
+        201:
+          description: Successfully deleted variant
+        401:
+          description: Valid authorization required.
+        404:
+          description: Product or variant not found.
+        501:
+          description: Not implemented.
+          
+    put:
+      tags:
+        - product variant management
+      operationId: updateVariant
+      summary: Update specific variant.
+      description: Update variant based on id.
+      parameters:
+        - name: productId
+          required: true
+          in: path
+          description: ID of the product.
+          schema:
+            type: string
+        - name: variantId
+          required: true
+          in: path
+          description: ID of the variant.
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/variant_post"
+      responses:
+        201:
+          description: Successfully updated variant
+        401:
+          description: Valid authorization required.
+        404:
+          description: Product or variant not found.
+        501:
+          description: Not implemented.
+          
+  /api/products/{productId}/images:
+    post:
+      tags:
+        - product image management
+      operationId: uploadImages
+      summary: Upload product images.
+      description: Upload images for given product. Can be done by merchant or admin.
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          description: ID of the product.
+          schema:
+            type: string
+            
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/image_post"
+      responses:
+        201:
+          description: Successfully uploaded images.
+        400:
+          description: Something went wrong.
+        401:
+          description: Valid authorization required.
+        404:
+          description: Product not found.
+        501:
+          description: Not implemented.
+          
+  /api/products/{productId}/images/{imageId}:
+    delete:
+      tags:
+        - product image management
+      operationId: deleteImage
+      summary: Delete product image.
+      description: Delete image for given product. Can be done by merchant or admin.
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          description: ID of the product.
+          schema:
+            type: string
+        - name: imageId
+          in: path
+          required: true
+          description: ID of the image.
+          schema:
+            type: number
+      responses:
+        201:
+          description: Successfully deleted image.
+        401:
+          description: Valid authorization required.
+        404:
+          description: Product or image not found.
+        501:
+          description: Not implemented.
+          
+  /api/products/{productId}/inventory:
+    post:
+      tags:
+        - inventory management
+      operationId: createInventory
+      summary: Create inventory for product.
+      description: Create inventory for given product.
+      parameters:
+        - name: productId
+          required: true
+          in: path
+          description: ID of product.
+          schema:
+            type: string
+      responses:
+        201:
+          description: Successfully created inventory.
+        400:
+          description: Something went wrong.
+        401:
+          description: Valid authorization required.
+        404:
+          description: Product not found.
+        501:
+          description: Not implemented.
+    get:
+      tags:
+        - inventory management
+      operationId: getInventory
+      summary: Get inventory of product.
+      description: Get the inventory details of the given product. This is stored SKU wise. In each SKU we have storewise details of stock.
+      parameters:
+        - name: productId
+          required: true
+          in: path
+          description: ID of product.
+          schema:
+            type: string
+      responses:
+        200:
+          description: Successfully retrieved inventory details.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/inventory"
+        404:
+          description: Product not found.
+        501:
+          description: Not implemented.
+    delete:
+      tags:
+        - inventory management
+      operationId: deleteInventory
+      summary: Delete inventory of product.
+      description: Delete the inventory details of the given product. Must be logged in as admin or store owner if deleting store wise inventory details.
+      parameters:
+        - name: productId
+          required: true
+          in: path
+          description: ID of product.
+          schema:
+            type: string
+        - name: store_id
+          in: query
+          description: Store ID. Filling this only deletes inventory for item in that store.
+          schema:
+            type: string
+        - name: sku
+          in: query
+          description: Filling this only deletes inventory for that product variant.
+          schema:
+            type: string
+      responses:
+        201:
+          description: Successfully deleted inventory details.
+        401:
+          description: Valid authorization required.
+        404:
+          description: Product not found.
+        501:
+          description: Not implemented.
+    put:
+      tags:
+        - inventory management
+      operationId: updateInventory
+      summary: Update inventory of product for store.
+      description: Update the inventory details of the given product for a particular store. Must be logged in as admin or merchant who created the store.
+      parameters:
+        - name: productId
+          required: true
+          in: path
+          description: ID of product.
+          schema:
+            type: string
+        - name: store_id
+          in: query
+          description: Store ID to select the store who's stock we want to update.
+          required: true
+          schema:
+            type: string
+        - name: sku
+          in: query
+          description: Filling this filters which variant we want to update inventory for;
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              example: {"stock":6}
+      responses:
+        201:
+          description: Successfully deleted inventory details.
+        401:
+          description: Valid authorization required.
+        404:
+          description: Product not found.
+        501:
+          description: Not implemented.
+      
+  /api/catalogs:
+    get:
+      tags:
+        - catalog management
+      summary: Get all catalogs.
+      operationId: getCatalogs
+      description: Get catalogs. Default page size is 5. Returns an array with catalog IDs.
+      parameters:
+        - name: page_size
+          description: Decides page size. (default value is 5)
+          schema:
+            type: number
+          in: query
+          example: 5
+        - name: page_no
+          description: Decides page number. (retrieves first page by default)
+          schema:
+            type: number
+          example: 1
+          in: query
+      responses:
+        200:
+          description: Successfully retrieved catalogs.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/catalog"
+        400:
+          description: Something went wrong.
+        501:
+          description: Not implemented.
+          
+    post:
+      tags:
+        - catalog management
+      operationId: createCatalog
+      summary: Create a catalog.
+      description: If global catalog then admin authorization is required. If store catalog then admin or merchant authorization is required. This is also where we can add some products in our catalog. Product IDs are stored in the catalog resource.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/catalog"
+      responses:
+        201:
+          description: Successfully created catalog.
+        400:
+          description: Something went wrong.
+        401:
+          description: Valid authorization required.
+        501:
+          description: Not implemented.
+          
+  /api/catalogs/{catalogId}:
+    get:
+      tags:
+        - catalog management
+      summary: Get specific catalog.
+      operationId: getSpecificCatalog
+      description: Get given catalog details.
+      parameters:
+        - name: catalogId
+          description: ID of the catalog.
+          schema:
+            type: string
+          in: path
+          required: true
+      responses:
+        200:
+          description: Successfully retrieved catalogs.
+          content:
+            application/json:
+              schema:
+                 $ref: "#/components/schemas/catalog"
+        400:
+          description: Something went wrong.
+        404:
+          description: Catalog not found.
+        501:
+          description: Not implemented.
+    put:
+      tags:
+        - catalog management
+      operationId: updateCatalog
+      summary: Update a catalog.
+      description: If global catalog then admin authorization is required. If store catalog then admin or merchant authorization is required. This is where we change details of the catalog and can also change what products are in it.
+      parameters:
+        - name: catalogId
+          description: ID of the catalog.
+          schema:
+            type: string
+          in: path
+          required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/catalog"
+      responses:
+        201:
+          description: Successfully updated catalog.
+        400:
+          description: Something went wrong.
+        401:
+          description: Valid authorization required.
+        404:
+          description: Catalog not found.
+        501:
+          description: Not implemented.
+    delete:
+      tags:
+        - catalog management
+      operationId: deleteCatalog
+      summary: Delete a catalog.
+      description: If global catalog then admin authorization is required. If store catalog then admin or merchant authorization is required.
+      parameters:
+        - name: catalogId
+          description: ID of the catalog.
+          schema:
+            type: string
+          in: path
+          required: true
+      responses:
+        201:
+          description: Successfully deleted catalog.
+        400:
+          description: Something went wrong.
+        401:
+          description: Valid authorization required.
+        404:
+          description: Catalog not found.
+        501:
+          description: Not implemented.
+          
+  /api/users/{username}/orders:
+    get:
+      tags:
+        - orders
+      operationId: getOrders
+      summary: Get orders.
+      description: Get all orders of the user. Must be logged in as admin or user to view this.
+      parameters:
+        - name: username
+          required: true
+          in: path
+          schema:
+            type: string
+          description: Username of user.
+      responses:
+        200:
+          description: Successfully retrieved orders.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/order"
+        401:
+          description: Valid authorization required.
+        404:
+          description: User does not exist.
+        501:
+          description: Not implemented.
+  
+  /api/users/{username}/cart/{cartId}/checkOut:
+    post:
+      tags:
+        - orders
+      operationId: checkOut
+      summary: Checkout
+      description: Checkout creates a new order and empties the cart. The order also creates a shipment object in the shipping collection to keep track of the delivery status of the order.
+      parameters:
+        - name: username
+          required: true
+          description: Username of user who's cart info needs to be retrieved.
+          in: path
+          schema:
+            type: string
+        - name: cartId
+          required: true
+          description: Id of the specific cart.
+          in: path
+          schema:
+            type: string
+      responses:
+        200:
+          description: Order successfully created.
+        400:
+          description: Something went wrong.
+        401:
+          description: Valid authorization needed.
+        404:
+          description: User or cart not found.
+        501:
+          description: Not implemented.
+          
+  /api/users/{username}/orders/{orderId}:
+    get:
+      tags:
+        - orders
+      operationId: getSpecificOrder
+      summary: Get order.
+      description: Get specific order of the user. Must be logged in as admin or user to view this.
+      parameters:
+        - name: username
+          required: true
+          in: path
+          schema:
+            type: string
+          description: Username of user.
+        - name: orderId
+          required: true
+          in: path
+          schema:
+            type: string
+          description: ID of order.
+      responses:
+        200:
+          description: Successfully retrieved order.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/order"
+        401:
+          description: Valid authorization required.
+        404:
+          description: User or order does not exist.
+        501:
+          description: Not implemented.
+          
+    delete:
+      tags:
+        - orders
+      operationId: deleteOrder
+      summary: Delete order.
+      description: Delete specific order of the user. Must be logged in as admin or user to do this.
+      parameters:
+        - name: username
+          required: true
+          in: path
+          schema:
+            type: string
+          description: Username of user.
+        - name: orderId
+          required: true
+          in: path
+          schema:
+            type: string
+          description: ID of order.
+      responses:
+        201:
+          description: Successfully deleted order.
+        401:
+          description: Valid authorization required.
+        404:
+          description: User or order does not exist.
+        501:
+          description: Not implemented.
+        
+    patch:
+      tags:
+        - orders
+      operationId: updateOrderStatus
+      summary: Update order.
+      description: Update order status.
+      parameters:
+        - name: username
+          required: true
+          in: path
+          schema:
+            type: string
+          description: Username of user.
+        - name: orderId
+          required: true
+          in: path
+          schema:
+            type: string
+          description: ID of order.
+      requestBody:
+        required: true
+        content:
+          applicatoin/json:
+            schema:
+              $ref: "#/components/schemas/updateOrder"
+      responses:
+        201:
+          description: Successfully updated order status.
+        400:
+          description: Something went wrong.
+        401:
+          description: Valid authorization required.
+        404:
+          description: User or order not found.
+        501:
+          description: Not implemented.
+
+  /api/users/{username}/orders/{orderId}/cancelOrder:
+    post:
+      tags:
+        - orders
+      operationId: cancelOrder
+      summary: Cancel order.
+      description: Cancel specific order of the user. Must be logged in as admin or user to do this.
+      parameters:
+        - name: username
+          required: true
+          in: path
+          schema:
+            type: string
+          description: Username of user.
+        - name: orderId
+          required: true
+          in: path
+          schema:
+            type: string
+          description: ID of order.
+      responses:
+        201:
+          description: Successfully cancelled order.
+        401:
+          description: Valid authorization required.
+        404:
+          description: User or order does not exist.
+        501:
+          description: Not implemented.
+          
+  /api/shipments/{shipmentId}:
+    get:
+      tags:
+        - shipping
+      operationId: getSpecificShipment
+      summary: Get shipment.
+      description: Get shipment details for an order. The shipment ID can be seen in order details. Shipments are automatically created when an order completes checkout.
+      parameters:
+        - name: shipmentId
+          in: path
+          required: true
+          description: ID of the shipment.
+          schema:
+            type: string
+      responses:
+        200:
+          description: Successfully retrieved shipment info.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/shipment"
+        401:
+          description: Authorization failed.
+        404:
+          description: Shipment not found.
+        501:
+          description: Not implemented.
+    
+    patch:
+      tags:
+        - shipping
+      operationId: updateShipmentStatus
+      summary: Update shipment status
+      description: Update shipment details for an order. This is used to do things like live tracking where we periodically update the current location of order.
+      parameters:
+        - name: shipmentId
+          in: path
+          required: true
+          description: ID of the shipment.
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/updateShipment"
+      responses:
+        200:
+          description: Successfully retrieved shipment info.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/shipment"
+        401:
+          description: Authorization failed.
+        404:
+          description: Shipment not found.
+        501:
+          description: Not implemented.
+    
+    delete:
+      tags:
+        - shipping
+      operationId: deleteShipment
+      summary: Delete shipment.
+      description: Deletes a shipment. This is used when an order is cancelled.
+      parameters:
+        - name: shipmentId
+          in: path
+          required: true
+          description: ID of the shipment.
+          schema:
+            type: string
+      responses:
+        201:
+          description: Successfully deleted shipment.
+        401:  
+          description: Authorization failed.
+        404:
+          description: Shipment not found.
+        501:
+          description: Not implemented.
+      
+  
+  /api/users/{username}/cart/{cartId}/getCartTotal:
+    get:
+      tags:
+        - payment
+      operationId: getTotalAmount
+      summary: Get cart total.
+      description: Get total cost of products in cart.
+      parameters:
+        - name: username
+          required: true
+          description: Username of user who's cart info needs to be retrieved.
+          in: path
+          schema:
+            type: string
+        - name: cartId
+          required: true
+          description: Id of the specific cart.
+          in: path
+          schema:
+            type: string
+      responses:
+        200:
+          description: Total successfully retrieved.
+          content:
+            application/json:
+              schema:
+                type: object
+                example: {"total_cost": "800"}
+        401:
+          description: Authorization failed.
+        404:
+          description: User or cart not found.
+        501:
+          description: Not implemented.
+          
+  /api/users/{username}/cart/{cartId}/payment:
+    post:
+      tags:
+        - payment
+      operationId: doPayment
+      summary: Payment process.
+      description: This is the payment procedure. Here we get payment method and other details. It is after this step that checkout happens.
+      parameters:
+        - name: username
+          required: true
+          description: Username of user who's cart info needs to be retrieved.
+          in: path
+          schema:
+            type: string
+        - name: cartId
+          required: true
+          description: Id of the specific cart.
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/paymentDetails"
+      responses:
+        201:
+          description: Payment details submitted.
+        401:
+          description: Authorization failed.
+        404:
+          description: User or cart not found.
+        501:
+          description: Not implemented.
+          
+  /api/products/{productId}/reviews:
+    get:
+      tags:
+        - reviews
+      operationId: getProductReviews
+      summary: Get product reviews.
+      description: Get all reviews of a given product. Default page size is 5.
+      parameters:
+        - name: productId
+          description: ID of the product.
+          required: true
+          in: path
+          schema:
+            type: string
+        - name: page_size
+          description: Decides page size. (default value is 5)
+          schema:
+            type: number
+          in: query
+          example: 5
+        - name: page_no
+          description: Decides page number. (retrieves first page by default)
+          schema:
+            type: number
+          example: 1
+          in: query
+      responses:
+        200:
+          description: Successfully retrieved all reviews.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/review"
+        404:
+          description: Product not found.
+        501:
+          description: Not implemented.
+          
+    post:
+      tags:
+        - reviews
+      operationId: createReview
+      summary: Create a product review.
+      description: Create review of a given product.
+      parameters:
+        - name: productId
+          description: ID of the product.
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/review"
+      responses:
+        200:
+          description: Successfully retrieved all reviews.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/review"
+        401:
+          description: Authorization error.
+        404:
+          description: Product not found.
+        501:
+          description: Not implemented.
+          
+  /api/products/{productId}/reviews/{reviewId}:
+    get:
+      tags:
+        - reviews
+      operationId: getSpecificProductReview
+      summary: Get product review.
+      description: Get specific review of a given product.
+      parameters:
+        - name: productId
+          description: ID of the product.
+          required: true
+          in: path
+          schema:
+            type: string
+        - name: reviewId
+          description: ID of the review.
+          schema:
+            type: number
+          in: path
+          required: true
+      responses:
+        200:
+          description: Successfully retrieved review.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/review"
+        400:
+          description: Something went wrong.
+        404:
+          description: Product or review not found.
+        501:
+          description: Not implemented.
+          
+    put:
+      tags:
+        - reviews
+      operationId: updateReview
+      summary: Update a product review.
+      description: Update review of a given product.
+      parameters:
+        - name: productId
+          description: ID of the product.
+          required: true
+          in: path
+          schema:
+            type: string
+        - name: reviewId
+          description: ID of the review.
+          schema:
+            type: number
+          in: path
+          required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/review"
+      responses:
+        201:
+          description: Successfully updated review.
+        401:
+          description: Authorization failed.
+        404:
+          description: Product or review not found.
+        501:
+          description: Not implemented.
+    
+    delete:
+      tags:
+        - reviews
+      operationId: deleteReview
+      summary: Delete a product review.
+      description: Delete review of a given product.
+      parameters:
+        - name: productId
+          description: ID of the product.
+          required: true
+          in: path
+          schema:
+            type: string
+        - name: reviewId
+          description: ID of the review.
+          schema:
+            type: number
+          in: path
+          required: true
+      responses:
+        201:
+          description: Successfully deleted review.
+        401:
+          description: Authorization failed.
+        404:
+          description: Product or review not found.
+        501:
+          description: Not implemented.      
+  
+  /api/search:
+    post:
+      tags:
+        - search
+      operationId: search
+      summary: Search website.
+      description: Searches every collection on the website and returns matching results.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              example: {"query": "string", "tags":[""], filters:[""]}
+      responses:
+        200:
+          description: Search successful.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+        400:
+          description: Something went wrong.
+        501:
+          description: Not implemented.
+  
+  /api/products/{productId}/recommendation:
+    get:
+      tags:
+        - product recommendation
+      operationId: getReco
+      summary: Get recommendations.
+      description: Get recommendations for similar products. Returns an array containing similar products.
+      parameters:
+        - name: productId
+          required: true
+          in: path
+          description: ID of product.
+          schema:
+            type: string
+      responses:
+        200:
+          description: Request successful.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/product"
+        400:
+          description: Something went wrong.
+        404:
+          description: Product not found.
+        501:
+          description: Not implemented.
+  
+  /api/stores/{storeId}/sendMessage:
+    post:
+      tags:
+        - customer service
+      operationId: sendMessage
+      summary: Send a message to store owner.
+      description: Sends an email to store owner containing query from customer.
+      parameters:
+        - name: storeId
+          description: ID of the store we want to update.
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/message"
+      responses:
+        201:
+          description: Successfully udpated details.
+        401:
+          description: Valid authentication required.
+        404:
+          description: Store not found.
+        501:
+          description: Not implemented.
+  
+security:
+  - bearerAuth: []
+      
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      
+  schemas:
+    message:
+      type: object
+      properties:
+        user_email:
+          type: string
+          format: email
+        subject:
+          type: string
+        message:
+          type: string
+        username:
+          type: string
+    
+    review:
+      type: object
+      properties:
+        username:
+          type: string
+        date:
+          type: string
+          format: date
+        review_content:
+          type: string
+        rating:
+          type: number
+        
+        
+  
+    paymentDetails:
+      type: object
+      properties:
+        total_amount:
+          type: number
+          example: 1000
+        payment_method:
+          type: string
+          example: "COD"
+        payment_is_card:
+          type: boolean
+          example: false
+        payment_is_cod:
+          type: boolean
+          example: true
+        
+  
+    updateShipment:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "Delivered"
+        current_location:
+          $ref: "#/components/schemas/address_info"
+  
+    shipment:
+      type: object
+      properties:
+        shipment_id:
+          type: number
+          example: 32
+        order_id:
+          type: number
+          example: 1
+        free_shipping:
+          type: boolean
+          example: true
+        delivery_address:
+          $ref: "#/components/schemas/address_info"
+        shipping_company:
+          type: string
+          example: "Blue Dart"
+        shipping_status:
+          type: string
+          example: "in transit"
+        current_location:
+          $ref: "#/components/schemas/address_info"
+  
+    updateOrder:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "Delivered"
+        bill_paid:
+          type: boolean
+          example: true
+  
+    order:
+      type: object
+      properties:
+        username:
+          type: string
+          example: user123
+          description: "This shows who owns the order."
+        order_id:
+          type: number
+          example: 1
+        shipment_id:
+          type: number
+          example: 32
+        order_items:
+          type: array
+          items:
+            type: object
+            properties:
+              product_id:
+                type: string
+                example: "bata_shoes"
+              product_variant_id:
+                type: string
+              quantity:
+                type: number
+        status:
+          type: string
+          example: "In Transit"
+        payment_method:
+          type: string
+          example: "COD"
+        bill_paid:
+          type: boolean
+          example: false
+  
+    catalog:
+      type: object
+      properties:
+        catalog_id:
+          type: string
+          example: fashion
+        catalog_name:
+          type: string
+          example: Fashion Catalogue
+        details:
+          type: object
+        product_list:
+          type: array
+          items:
+            type: string
+          example: ["denim_shirt","nike_boots"]
+          properties:
+            is_store_catalogue:
+              type: boolean
+              example: false
+            is_global_catalogue:
+              type: boolean
+              example: true
+            store_id:
+              type: string
+              example: null
+              description: If store ID is null it means this is a global catalog.
+            description:
+              type: string
+              example: "This is the site wide fashion catalogue."
+        
+    
+    inventory:
+      type: object
+      properties:
+        sku:
+          type: string
+          example: "PUMA-SHIRT-GREEN-SMALL"
+        store_inventory:
+          type: array
+          items:
+            type: object
+            properties:
+              store_id:
+                type: string
+              stock:
+                type: number
+            example: [{"store_id":"mystore123","stock":8}, {"store_id":"mystore12","stock":14}, {"store_id":"mystore12345","stock":0}]
+    
+    image_post:
+      type: object
+      properties:
+        imageFiles:
+          type: array
+          items:
+            type: string
+            format: binary
+            
+    variant_post:
+      type: object
+      properties:
+        parent_sku:
+          type: string
+          example: "BOSE-QC35"
+        variant_id:
+          type: number
+          example: 1
+        option_id:
+          type: number
+          example: 1
+        option_name:
+          type: string
+          example: colour
+        option_value_id:
+          type: number
+          example: 1
+        variant_details:
+          type: object
+          properties:
+            description:
+              type: string
+              example: "This is a description of the red colour variant"
+          
+  
+    option:
+      type: object
+      properties:
+        option_name:
+          type: string
+          example: colour
+        option_id:
+          type: number
+          example: 1
+          description: This should increase incrementally.
+        description:
+          type: string
+          example: This option allows you to pick the colour of the product.
+        option_values:
+          type: array
+          items:
+            $ref: "#/components/schemas/option_value"
+          example:
+            [{"is_default":"true","option_value_name":"blue","sku_label":"BLU","value_id":"1","additional_details":{"description":"This is the blue colour option."}}, {"is_default":"false","option_value_name":"red","sku_label":"RED","value_id":"2","additional_details":{"description":"This is the red colour option."}}]
+    option_value:
+      type: object
+      properties:
+        is_default:
+          type: boolean
+        option_value_name:
+          type: string
+        sku_label:
+          type: string
+        value_id:
+          type: number
+        additional_details:
+          type: object
+  
+    product:
+      type: object
+      properties:
+        product_name:
+          type: string
+          example: "Redmi Note Pro"
+        product_id:
+          type: string
+          example: "redminotepro"
+        sku:
+          type: string
+          example: "RED-redminotepro"
+        tags:
+          type: array
+          items: {}
+          example: ["phone","redmi","pro","smart"]
+        category_id:
+          type: string
+          example: "smartphone"
+        details:
+          type: object
+          properties:
+            description:
+              type: string
+              example: "This is the latest smartphone from Redmi."
+            price:
+              type: number
+              example: 14999
+          
+    product_post:
+      type: object
+      properties:
+        product_id:
+          type: string
+          example: "redminotepro"
+        product_name:
+          type: string
+          example: "Redmi Note Pro"
+        category_id:
+          type: string
+          example: "smartphone"
+        brand_id:
+          type: string
+          example: "redmi"
+        tags:
+          type: array
+          items: {}
+          example: ["phone","redmi","pro","smart"]
+        details:
+          type: object
+          properties:
+            description:
+              type: string
+              example: "This is the latest smartphone from Redmi."
+            cost_price:
+              type: number
+              example: 14999
+  
+    product_post_response:
+      type: object
+      properties:
+        product_code:
+          type: number
+          example: 10001
+        sku:
+          type: string
+          example: "redmi-smartphone-base"
+    
+    address_info:
+      type: object
+      properties:
+        address:
+          type: string
+          example: 72 Cardinal St. Mechanicsburg
+        state:
+          type: string
+          example: Pennsylvania
+        country:
+          type: string
+          example: USA
+        pin_code:
+          type: number
+          example: 17050
+          
+    store:
+      type: object
+      properties:
+        store_id:
+          type: string
+          example: exampleshop123
+        store_name:
+          type: string
+          example: Example Store 1
+        details:
+          type: object
+          properties:
+            description:
+              type: string
+              example: "This is an example description for Example Store 1."
+            phone_no:
+              type: number
+              example: 1234567899
+            email:
+              type: string
+              format: email
+              example: "examplemail@store.com"
+        address_info:
+          $ref: "#/components/schemas/address_info"
+  
+    brand:
+      type: object
+      properties:
+        brand_id:
+          type: string
+          example: "myBrand"
+        brand_name:
+          type: string
+          example: "My Brand"
+        sku_label:
+          type: string
+          example: "BOS"
+          description: This label is used in SKU.
+        details:
+          type: object
+          example: {"description":"This is a brand of the MyBrand company.", "company":"MyBrand"}
+  
+    specific_merchant:
+      type: object
+      properties:
+        merchant_name:
+          type: string
+          example: "Avinash Kishore"
+        merchant_username:
+          type: string
+          example: "merch1avinash"
+        merchant_email:
+          type: string
+          example: "merchavinash123@merchant.com"
+          format: email
+        details:
+          type: string
+        password:
+          type: string
+        stores:
+          type: array
+          items:
+            $ref: "#/components/schemas/stores_array"
+          example: [{"store_id":"123", "store_name":"Store 1"}, {"store_id":"1234","store_name":"Store 2"}]
+    
+    stores_array:
+      type: object
+      properties:
+        store_id:
+          type: string
+        store_name:
+          type: string
+    
+    merchant:
+      type: object
+      properties:
+        merchant_name:
+          type: string
+          example: "Avinash Kishore"
+        merchant_username:
+          type: string
+          example: "merch1avinash"
+        merchant_email:
+          type: string
+          example: "merchavinash123@merchant.com"
+          format: email
+        details:
+          type: string
+        password:
+          type: string
+        
+  
+    categories:
+      type: array
+      items:
+        $ref: "#/components/schemas/category"
+      
+  
+    cart_item:
+      type: object
+      properties:
+        cart_id:
+          type: string
+        product_name:
+          type: string
+        unique_product_code:
+          type: string
+        quantity:
+          type: number
+        cart_index_identifier:
+          type: string
+    
+    refreshToken:
+      type: object
+      properties:
+        token:
+          type: string
+          example: "this is a placeholder for refresh token"
+    
+    cart:
+      type: array
+      items:
+        $ref: "#/components/schemas/cart_item"
+    users:
+      type: array
+      items:
+        $ref: "#/components/schemas/user_no_pass"
+    user:
+      type: object
+      properties:
+        username:
+          type: string
+          example: jack63
+        firstName:
+          type: string
+          example: Jack
+        lastName:
+          type: string
+          example: Ryan
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          example: password123
+        country:
+          type: string
+          example: Germany
+        shippingAddress:
+          $ref: "#/components/schemas/address_info"
+          #type: string
+          #example: "72 Cardinal St. Mechanicsburg, PA 17050"
+    
+    
+    user_no_pass:
+      type: object
+      properties:
+        username:
+          type: string
+          example: ron35
+        firstName:
+          type: string
+          example: Robert
+        lastName:
+          type: string
+          example: Kennedy
+        email:
+          type: string
+          format: email
+          example: "email234@email.com"
+        country:
+          type: string
+          example: USA
+        shippingAddress:
+          $ref: "#/components/schemas/address_info"
+          #type: string
+          #example: "73 Cardinal St. Peters, PA 17010"
+          
+    category:
+      type: object
+      properties:
+        parent_category_id:
+          type: string
+          example: null
+        category_hierarchy_level:
+          type: number
+          example: 0
+        category_name:
+          type: string
+          example: "Books"
+        category_id:
+          type: string
+          example: book
+        sku_label: 
+          type: string
+          example: book
+        category_specific_attributes:
+          type: object
+          example: {
+            "author": "string",
+            "no_of_pages": "number",
+            "format": "string",
+            "language": "string"
+          }
+        description:
+          type: string
+          example: "This category is for books."
+        sub_category_ids:
+          type: array
+          items: 
+            type: string
+            example:
+              - history_book
+              - adventure_book
+              - scifi_book
+            #$ref: "#/components/schemas/category"
+            #example:
+            #  parent_category_id: book
+            #  category_name: "History"
+            #  category_id: history_book
+            #  category_specific_attributes: {
+            #      "author": "string",
+            #      "no_of_pages": "number",
+            #      "format": "string",
+            #      "language": "string"
+            #    }
+            #  description: "This is history books subcategory of books."
+            #  sub_category_ids: [null]  
+          
+    login:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
